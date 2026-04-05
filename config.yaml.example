@@ -1,0 +1,55 @@
+# ACS 期刊下载器配置模板
+# 复制此文件为 config.yaml 并填入你的账号信息
+
+# 图书馆账号配置
+library:
+  # 图书馆登录 URL
+  login_url: "YOUR_LIBRARY_LOGIN_URL"
+  
+  # 图书馆卡号
+  username: "YOUR_CARD_NUMBER"
+  
+  # 图书馆密码
+  password: "YOUR_PASSWORD"
+  
+  # ACS 入口页面 URL
+  acs_entry_url: "YOUR_LIBRARY_ACS_ENTRY_URL"
+
+# ACS 配置
+acs:
+  # 默认期刊代码 (JMC = Journal of Medicinal Chemistry)
+  default_journal: "jmcmar"
+  
+  # 默认 Volume 和 Issue (null = 最新一期)
+  default_volume: null
+  default_issue: null
+  
+  # 期刊名称映射
+  journals:
+    jmcmar: "Journal of Medicinal Chemistry"
+    jacsat: "Journal of the American Chemical Society"
+    anano: "ACS Nano"
+    esthag: "Environmental Science & Technology"
+    chreay: "Chemical Reviews"
+
+# 下载配置
+download:
+  # 下载目录 (相对于工作目录)
+  output_dir: "acs_papers"
+  
+  # 下载间隔 (秒)
+  delay: 2
+  
+  # 最大重试次数
+  max_retries: 3
+  
+  # 超时时间 (秒)
+  timeout: 60
+
+# 浏览器配置
+browser:
+  # 是否无头模式
+  headless: false
+  
+  # 浏览器配置文件目录
+  profile_dir: "browser_profile"
