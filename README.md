@@ -61,3 +61,5 @@ PDF 文件保存在 `acs_papers/` 目录，文件名格式为 `DOI.pdf`。
 1. 首次运行需要登录图书馆账号
 2. 浏览器配置文件保存在 `browser_profile/` 目录
 3. 如果下载中断，重新运行会跳过已下载的文件
+4. 遇到 SSO、验证码、Cloudflare、Turnstile 或 PDF 假下载问题时，优先参考 `references/troubleshooting.md`
+5. 真正的论文 PDF 必须通过浏览器内认证状态下的 `fetch + blob + base64` 保存，不要用 `page.pdf()` 代替真实下载
