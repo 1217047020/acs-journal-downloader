@@ -24,19 +24,56 @@ wheels/
 venv/
 ENV/
 env/
+.venv/
 
-# Browser Profile
+# Browser Profiles / cookies
 browser_profile/
+browser_profile*/
+cookies_oa.json
 
-# Downloaded Papers
+# Downloaded Papers / runtime outputs
 acs_papers/
 acs_papers_real/
+acs_oa_papers/
+logs/
+*.log
+*.state
+upload_report.txt
 
 # Config with sensitive data
 config.yaml
 
-# Keep template
+# Keep templates / non-secret OA config
 !config.yaml.example
+!config_oa.yaml
+
+# Local plans / notes
+findings.md
+progress.md
+task_plan.md
+PAUSED_STATUS.md
+ALERT.txt
+
+# Diagnostics / one-off probes
+debug_*/
+/tmp_*.html
+/tmp*.html
+diag_*.py
+diag_*.json
+manual_*_probe.py
+manual_diag_*.py
+probe_*.py
+smoke_*.py
+retry_*.py
+entry_*.json
+mismatch_*.json
+deleted_duplicate_*.json
+duplicate_*.json
+jmcmar_merge_*.json
+issue*_manual_diag.json
+remote_pdf_*report*.json
+*_state.json
+oa_cron_jobs.json
 
 # OS
 .DS_Store

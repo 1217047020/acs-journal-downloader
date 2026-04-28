@@ -1,6 +1,31 @@
 # Troubleshooting
 
-## 1. Login succeeds but ACS is not reached
+## 1. Browser cannot launch at all
+
+Typical errors:
+- `Missing X server or $DISPLAY`
+- `The platform failed to initialize`
+- browser exits immediately after launch in headed mode
+
+Cause:
+- the downloader is running in headed mode without a usable display server
+
+Fix:
+- on desktop Linux, ensure `DISPLAY` points to a working X session
+- on headless servers, use `xvfb-run -a <command>`
+- or start Xvfb manually, for example:
+
+```bash
+Xvfb :99 -screen 0 1920x1080x24 &
+export DISPLAY=:99
+.venv/bin/python acs_downloader.py jmcmar --volume 69 --issue 6
+```
+
+Important:
+- solve this before debugging ACS selectors, login flow, or PDF handling
+- this is an environment problem, not an ACS-site problem
+
+## 2. Login succeeds but ACS is not reached
 
 Check:
 - ACS entry URL is still valid
@@ -14,7 +39,7 @@ Recovery:
 - repeat first-step then second-step flow
 - wait longer after SSO accept
 
-## 2. SSO page changed
+## 3. SSO page changed
 
 Known successful selectors:
 - remember consent: `input[value="_shib_idp_rememberConsent"]`
@@ -25,7 +50,7 @@ If they change:
 - search for accept/proceed/consent/remember text
 - save screenshot + HTML for diffing
 
-## 3. Cloudflare / Turnstile / anti-bot challenge
+## 4. Cloudflare / Turnstile / anti-bot challenge
 
 Recommended sequence:
 1. Retry in headed mode
@@ -41,25 +66,30 @@ Known-good pattern from this workspace:
 - persistent user data dir
 - Xvfb display (`DISPLAY=:99` or `xvfb-run -a`)
 
-## 4. PDF links are found but downloaded files are fake
+## 5. PDF links are found but downloaded files are fake
 
 Bad signs:
 - 1 page only
 - a few hundred KB when article should be several MB
 - output title looks correct but content is just rendered webpage
+- response body contains Chrome PDF viewer shell assets such as `pdf_embedder.css`
+- page HTML includes access-denial markers even when HTTP status is 200
 
 Cause:
 - using Playwright/Patchright `page.pdf()` on the browser page
+- reading the PDF viewer shell instead of the true PDF bytes
+- trusting `Content-Type: application/pdf` without validating the saved file header
 
 Fix:
 - open the ACS PDF URL inside the authenticated browser context
-- confirm `document.contentType == "application/pdf"`
+- confirm `document.contentType == "application/pdf"`, but do not rely on that alone
 - run `fetch(window.location.href)` inside the page
-- read response as blob
-- convert blob to base64 in page JS
+- read response as blob / arrayBuffer
+- convert bytes to base64 in page JS
 - decode and save in Python
+- verify the saved file begins with `%PDF-`
 
-## 5. Curl download returns HTML instead of PDF
+## 6. Curl download returns HTML instead of PDF
 
 Cause:
 - missing browser session state, referer, or JS-mediated auth state
@@ -68,7 +98,7 @@ Fix:
 - prefer in-browser authenticated fetch instead of curl
 - only use curl after proving that cookies + headers are enough
 
-## 6. Specific issue download fails
+## 7. Specific issue download fails
 
 Expected URL shape:
 - latest: `https://pubs.acs.org/toc/<journal>/current`
@@ -82,7 +112,7 @@ Check:
 - volume and issue both set
 - target issue exists
 
-## 7. Recommended debug artifacts
+## 8. Recommended debug artifacts
 
 When something breaks, save:
 - current URL

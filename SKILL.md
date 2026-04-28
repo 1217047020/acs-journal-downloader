@@ -5,9 +5,34 @@ description: Download papers from ACS journals through institutional library acc
 
 # ACS Journal Downloader
 
-Use this skill to download ACS journal issue PDFs through a library gateway.
+Use this skill to download ACS journal issue PDFs through a library gateway, or to download ACS Open Access / Free to Read papers with browser-based extraction.
+
+## Runtime requirements
+
+This workflow is designed for a **headed browser** session, not pure headless mode.
+
+- Default browser mode should stay `headless: false`.
+- On machines with a desktop session, ensure a working X server and `DISPLAY` are available.
+- On headless Linux servers, run the downloader under a virtual display such as `xvfb-run -a` or start Xvfb manually and export `DISPLAY`.
+- If the browser fails immediately with errors like `Missing X server or $DISPLAY` or `The platform failed to initialize`, treat that as an environment problem first, not an ACS-site problem.
+
+Recommended server-side launch pattern:
+
+```bash
+xvfb-run -a python acs_downloader.py jmcmar --volume 69 --issue 6
+```
+
+If you need manual display control:
+
+```bash
+Xvfb :99 -screen 0 1920x1080x24 &
+export DISPLAY=:99
+python acs_downloader.py jmcmar --volume 69 --issue 6
+```
 
 ## Workflow
+
+### A. Library-gateway workflow
 
 1. Log in to the library portal with configured credentials.
 2. Open the configured ACS entry page from the library.
@@ -27,6 +52,18 @@ Use this skill to download ACS journal issue PDFs through a library gateway.
    - Confirm `document.contentType === "application/pdf"`.
    - Use in-page `fetch()` + `blob()` + `FileReader.readAsDataURL()` to extract bytes.
    - Decode base64 in Python and save the real PDF.
+
+### B. OA / Free-to-Read workflow
+
+1. Open the ACS TOC page directly, without library login.
+2. Parse the page by individual `issue-item` blocks rather than greedy whole-page regex.
+3. Detect OA / FTR markers within each article block and extract the matching DOI.
+4. Normalize the DOI into the target filename and check whether the remote file already exists.
+5. Skip already-existing remote files before issuing PDF requests.
+6. Open `/doi/pdf/...` in persistent Chrome context.
+7. Use in-browser `fetch + arrayBuffer/base64` to export real PDF bytes.
+8. Verify the saved bytes begin with `%PDF-` before treating the download as success.
+9. Upload the PDF, then remove the local copy after successful upload.
 
 ## Important implementation detail
 
@@ -55,6 +92,7 @@ If automation encounters protection or access friction, use these strategies in 
 - Prefer normal form filling first.
 - Reuse browser profile to preserve cookies and reduce repeated checks.
 - Keep headed mode enabled when the site behaves differently in headless mode.
+- If the browser cannot launch because there is no GUI session, fix the display layer first with Xvfb / `xvfb-run -a` before debugging selectors or login flow.
 
 ### 2. Shibboleth / institutional consent page
 
@@ -91,4 +129,4 @@ Fix:
 
 ## When to read more
 
-- Read `references/troubleshooting.md` when login flow changes, SSO pages differ, Cloudflare appears, or saved files are too small.
+- Read `references/troubleshooting.md` when login flow changes, SSO pages differ, Cloudflare appears, browser startup fails because of missing display/X server, or saved files are too small.

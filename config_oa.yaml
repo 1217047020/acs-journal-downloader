@@ -1,0 +1,38 @@
+# ACS Open Access 下载器配置
+
+# ACS 配置
+acs:
+  # 默认期刊代码 (JMC = Journal of Medicinal Chemistry)
+  default_journal: "jmcmar"
+  
+  # 期刊名称映射
+  journals:
+    jmcmar: "Journal of Medicinal Chemistry"
+    jacsat: "Journal of the American Chemical Society"
+    anano: "ACS Nano"
+    esthag: "Environmental Science & Technology"
+    chreay: "Chemical Reviews"
+    mpohbp: "Molecular Pharmaceutics"
+    jmcbdf: "Journal of Medicinal Chemistry Letters"
+    opdib7: "Organic Process Research & Development"
+    jafcau: "Journal of Agricultural and Food Chemistry"
+    bcches: "Biochemistry"
+
+# 下载配置
+download:
+  # 下载目录 (相对于工作目录)
+  output_dir: "acs_oa_papers"
+  
+  # 下载间隔 (秒)
+  delay: 2
+  
+  # 超时时间 (秒)
+  timeout: 60
+
+# 浏览器配置
+browser:
+  # OA 下载器当前按有头浏览器流程工作；服务器上请配合 xvfb-run 使用
+  headless: false
+  
+  # 浏览器配置文件目录
+  profile_dir: "browser_profile_oa"
